@@ -1,4 +1,5 @@
 import numpy as np
+import math
 # You need to build your own model here instead of using well-built python packages such as sklearn
 
 from sklearn.naive_bayes import MultinomialNB
@@ -41,18 +42,46 @@ class NaiveBayesClassifier(HateSpeechClassifier):
     """Naive Bayes Classifier
     """
     def __init__(self):
-        # Add your code here!
-        raise Exception("Must be implemented")
-        
+        # Store dict of dict of words for each class (In the project, hate / not hate)
+        self.count = {}
+        # hate / not hate
+        self.classes = None
 
     def fit(self, X, Y):
-        # Add your code here!
-        raise Exception("Must be implemented")
         
+        self.classes = set(Y.tolist())
+        print(self.classes)
+        
+        for _class in self.classes:
+            self.count[_class] = {}
+            self.count['total_sen'] = len(X) 
+            for i in range(len(X[0])):
+                self.count[_class][i] = 0
+            self.count[_class]['total_word'] = 0
+            self.count[_class]['total_sen'] = 0
+        
+        for i in range(len(X)):
+            for j in range(len(X[0])):
+                self.count[Y[i]][j] += X[i][j]
+                self.count[Y[i]]['total_word'] += X[i][j]
+            self.count[Y[i]]['total_sen'] += 1
     
+    def _log_prob(self, _class, sen):
+        log_prob_cls = np.log(self.count[_class]['total_sen']) - np.log(self.count['total_sen'])
+        total_words = len(sen)
+        for i in range(len(sen)):
+            # add test into corpus
+            #current_word_prob = sen[i] * (np.log(self.count[_class][i]+1)-np.log(self.count[_class]['total_word']+total_words))
+            # not add test into corpus
+            current_word_prob = sen[i] * (np.log(self.count[_class][i]+math.exp(-10))-np.log(self.count[_class]['total_word']))
+            log_prob_cls += current_word_prob
+        
+        return log_prob_cls
+
     def predict(self, X):
-        # Add your code here!
-        raise Exception("Must be implemented")
+        print(self._log_prob(1, X[0]))
+        
+
 
 # TODO: Implement this
 class LogisticRegressionClassifier(HateSpeechClassifier):
