@@ -64,7 +64,7 @@ class NaiveBayesClassifier(HateSpeechClassifier):
             self.count[_class]['total_word'] = 0
             self.count[_class]['total_sen'] = 0
         
-        for i in tqdm(range(len(X))):
+        for i in range(len(X)):
             for j in range(len(X[0])):
                 self.count[Y[i]][j] += X[i][j]
                 self.count[Y[i]]['total_word'] += X[i][j]
@@ -85,7 +85,7 @@ class NaiveBayesClassifier(HateSpeechClassifier):
 
     def predict(self, X):
         res = []
-        for i in tqdm(range(len(X))):
+        for i in range(len(X)):
             pred = []
             for cls in self.classes:
                 pred.append(self._log_prob(cls, X[i]))
