@@ -70,6 +70,17 @@ class NaiveBayesClassifier(HateSpeechClassifier):
                 self.count[Y[i]]['total_word'] += X[i][j]
             self.count[Y[i]]['total_sen'] += 1
 
+        # give the ratio of different class of words
+        self.prob_ratio = {}
+        for i in range(len(X[0])):
+            pos_prob = self.count[0][i] / self.count[0]['total_word']
+            neg_prob = self.count[1][i] / self.count[1]['total_word']
+            self.prob_ratio[i] = [pos_prob/neg_prob]
+        
+        print("Top-10", self.prob_ratio.sort()[-10:])
+        print("Top-10-reverse", self.prob_ratio.sort()[:10])
+
+
 
     def _log_prob(self, _class, sen):
         log_prob_cls = np.log(self.count[_class]['total_sen']) - np.log(self.count['total_sen'])
@@ -89,12 +100,8 @@ class NaiveBayesClassifier(HateSpeechClassifier):
             pred = []
             for cls in self.classes:
                 pred.append(self._log_prob(cls, X[i]))
-
             res.append(pred.index(max(pred)))
-
         return res
-
-        
 
 
 # TODO: Implement this
@@ -102,13 +109,61 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
     """Logistic Regression Classifier
     """
     def __init__(self):
-        # Add your code here!
-        raise Exception("Must be implemented")
+        self.lr = 0.01
+        self.batch_size = 16
+        self.n_iterations = 10000
+        self.patience = 2
+        self.min_delta = 1e-2        
+        self.sigmoid = lambda z : 1 / (1 + np.exp(-z))
+        self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat)) / len(y_hat)
+
+    
+    def gradient_descent(X, y, weight, lr):
+        y = y.reshape(-1, 1)
+        gradients = np.dot(X.T, sigmoid(np.dot(X, weight.T)) - y) / len(y)
+        new_weight = weight - lr * gradients.T
+
+        return new_weight
+    
+    def prepare_batches(X, y, batch_size):
+        X_batch = []
+        y_batch = []
         
+        for i in range(len(len(y) // batch_size)):
+            X_batch.append(np.array(X[i*batch_size : i* batch_size+batch_size, :]))
+            y_batch.append(np.array(y[i*batch_size : i* batch_size+batch_size]))
+
+        if len(y) % batch_size > 0:
+            X_batch.append(X[len(y) // batch_size * batch_size :, :])
+            y_batch.append(y[len(y) // batch_size * batch_size :])
+            
+        return np.array(X_batch), np.array(y_batch)
 
     def fit(self, X, Y):
-        # Add your code here!
-        raise Exception("Must be implemented")
+
+        self.weight = np.random.random(X.shape[1]).reshape(1, -1)
+        
+        X_batch, Y_batch = prepare_batches(X, Y, self.batch_size)
+        n_batch = len(y_batch)
+
+        patience = 0
+        n_iter = 0
+
+        prev = float("inf")
+
+        while n_iter < self.n_iterations:
+            for i in range(n_batch):
+                X_mini = X_batch[i]
+                Y_mini = Y_batch[i]
+
+                self.weight = gradient_descent(X_batch, Y_batch, self.weight, self.lr)
+
+                y_pred = sigmoid(np.dot(X_batch, self.weight.T))
+
+
+
+
+
         
     
     def predict(self, X):
