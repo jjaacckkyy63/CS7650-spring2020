@@ -77,8 +77,8 @@ class NaiveBayesClassifier(HateSpeechClassifier):
             neg_prob = self.count[1][i] / self.count[1]['total_word']
             self.prob_ratio[i] = [pos_prob/neg_prob]
         
-        print("Top-10", self.prob_ratio.sort()[-10:])
-        print("Top-10-reverse", self.prob_ratio.sort()[:10])
+        print("Top-10", self.prob_ratio.items().sort(key=lambda kv: kv[1])[-10:])
+        print("Top-10-reverse", self.prob_ratio.items().sort(key=lambda kv: kv[1])[:10])
 
 
 
@@ -112,10 +112,11 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         self.lr = 0.01
         self.batch_size = 16
         self.n_iterations = 10000
-        self.patience = 2
-        self.min_delta = 1e-2        
         self.sigmoid = lambda z : 1 / (1 + np.exp(-z))
         self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat)) / len(y_hat)
+        self.train_loss = []
+        self.test_loss = []
+        self.weight = np.random.random(X.shape[1]).reshape(1, -1)
 
     
     def gradient_descent(X, y, weight, lr):
@@ -140,31 +141,29 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         return np.array(X_batch), np.array(y_batch)
 
     def fit(self, X, Y):
-
-        self.weight = np.random.random(X.shape[1]).reshape(1, -1)
         
-        X_batch, Y_batch = prepare_batches(X, Y, self.batch_size)
+        X_batch, Y_batch = self.prepare_batches(X, Y, self.batch_size)
         n_batch = len(y_batch)
-
-        patience = 0
         n_iter = 0
 
-        prev = float("inf")
-
         while n_iter < self.n_iterations:
+            iter_correct = 0
             for i in range(n_batch):
                 X_mini = X_batch[i]
                 Y_mini = Y_batch[i]
 
-                self.weight = gradient_descent(X_batch, Y_batch, self.weight, self.lr)
+                self.weight = self.gradient_descent(X_mini, Y_mini, self.weight, self.lr)
+                y_pred = self.sigmoid(np.dot(X_mini, self.weight.T))
 
-                y_pred = sigmoid(np.dot(X_batch, self.weight.T))
-
-
-
-
-
-        
+                self.train_loss.append(self.logloss(y_pred, Y_mini) / len(Y_mini))
+              
+                y_pred = [1 for x in self.sigmoid(np.dot(X_test, betas.T)) if x > 0.5 else 0]
+                batch_correct = y_pred==Y_mini
+                iter_correct += batch_correct
+            n_iter += 1
+            train_iter_acc = iter_correct / len(Y)
+            print("Iteration:", n_iter+1, "Acc:", train_iter_acc)
+            
     
     def predict(self, X):
         # Add your code here!
