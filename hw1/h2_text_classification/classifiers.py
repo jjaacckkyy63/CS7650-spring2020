@@ -120,7 +120,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
     
     def gradient_descent(self, X, y, weight, lr):
         y = y.reshape(-1, 1)
-        gradients = (np.dot(X.T, sigmoid(np.dot(X, weight.T)) - y) - 2 * self.reg_coefficient * weight) / len(y)
+        gradients = (np.dot(X.T, self.sigmoid(np.dot(X, weight.T)) - y) - 2 * self.reg_coefficient * weight) / len(y)
         new_weight = weight - lr * gradients.T
 
         return new_weight
