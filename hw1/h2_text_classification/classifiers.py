@@ -143,7 +143,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
     def fit(self, X, Y):
         self.weight = np.random.random(X.shape[1]).reshape(1, -1)
         self.l2_reg = self.reg_coefficient*np.dot(self.weight.T, self.weight)
-        print(self.l2_reg)
+        print(self.l2_reg.shape)
         # self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat))  / len(y_hat)
         self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat)) + self.reg_coefficient*np.dot(self.weight.T, self.weight) / len(y_hat)
 
