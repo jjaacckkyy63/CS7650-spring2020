@@ -86,9 +86,6 @@ class NaiveBayesClassifier(HateSpeechClassifier):
         log_prob_cls = np.log(self.count[_class]['total_sen']) - np.log(self.count['total_sen'])
         total_words = len(sen)
         for i in range(len(sen)):
-            # add test into corpus
-            #current_word_prob = sen[i] * (np.log(self.count[_class][i]+1)-np.log(self.count[_class]['total_word']+total_words))
-            # not add test into corpus
             current_word_prob = sen[i] * (np.log(self.count[_class][i]+math.exp(-10))-np.log(self.count[_class]['total_word']))
             log_prob_cls += current_word_prob
         
@@ -113,15 +110,19 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         self.batch_size = 16
         self.n_iterations = 10000
         self.sigmoid = lambda z : 1 / (1 + np.exp(-z))
-        self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat)) / len(y_hat)
+        self.weight = np.random.random(X.shape[1]).reshape(1, -1)
+        self.reg_coefficient = 0.01
+        self.l2_reg = reg_coefficient*np.dot(weights.T, weights)
+        self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat) + self.l2_reg) / len(y_hat)
+
         self.train_loss = []
         self.test_loss = []
-        self.weight = np.random.random(X.shape[1]).reshape(1, -1)
+        
 
     
     def gradient_descent(X, y, weight, lr):
         y = y.reshape(-1, 1)
-        gradients = np.dot(X.T, sigmoid(np.dot(X, weight.T)) - y) / len(y)
+        gradients = (np.dot(X.T, sigmoid(np.dot(X, weight.T)) - y) - 2 * self.reg_coefficient * weight) / len(y)
         new_weight = weight - lr * gradients.T
 
         return new_weight
@@ -166,5 +167,9 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
             
     
     def predict(self, X):
-        # Add your code here!
-        raise Exception("Must be implemented")
+
+        preds = []
+        for item in X:
+            preds.append((self.sigmoid(np.dot(item, self.weight.T)) > 0.5)*1)
+        print(preds)
+
