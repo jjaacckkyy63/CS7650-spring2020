@@ -77,8 +77,9 @@ class NaiveBayesClassifier(HateSpeechClassifier):
             neg_prob = self.count[1][i] / self.count[1]['total_word']
             self.prob_ratio[i] = [pos_prob/neg_prob]
         
-        print("Top-10", self.prob_ratio.items().sort(key=lambda kv: kv[1])[-10:])
-        print("Top-10-reverse", self.prob_ratio.items().sort(key=lambda kv: kv[1])[:10])
+        print(self.prob_ratio)
+        print("Top-10", sorted(self.prob_ratio.items(),key=lambda kv: kv[1])[-10:])
+        print("Top-10-reverse", sorted(self.prob_ratio.items(),key=lambda kv: kv[1])[:10])
 
 
 
@@ -148,8 +149,10 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         n_iter = 0
 
         while n_iter < self.n_iterations:
+            print("Iteration:",n_iter)
             iter_correct = 0
             for i in range(n_batch):
+                print("Batch:", i,"/",n_batch)
                 X_mini = X_batch[i]
                 Y_mini = Y_batch[i]
 
