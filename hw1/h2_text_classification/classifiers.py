@@ -112,7 +112,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         self.n_iterations = 10000
         self.sigmoid = lambda z : 1 / (1 + np.exp(-z))
         self.reg_coefficient = 0.01
-        self.l2_reg = reg_coefficient*np.dot(weights.T, weights)
+        self.l2_reg = self.reg_coefficient*np.dot(weights.T, weights)
         self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat) + self.l2_reg) / len(y_hat)
 
         self.train_loss = []
