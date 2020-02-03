@@ -111,7 +111,6 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         self.batch_size = 16
         self.n_iterations = 10000
         self.sigmoid = lambda z : 1 / (1 + np.exp(-z))
-        self.weight = np.random.random(X.shape[1]).reshape(1, -1)
         self.reg_coefficient = 0.01
         self.l2_reg = reg_coefficient*np.dot(weights.T, weights)
         self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat) + self.l2_reg) / len(y_hat)
@@ -144,6 +143,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
 
     def fit(self, X, Y):
         
+        self.weight = np.random.random(X.shape[1]).reshape(1, -1)
         X_batch, Y_batch = self.prepare_batches(X, Y, self.batch_size)
         n_batch = len(y_batch)
         n_iter = 0
