@@ -129,7 +129,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         X_batch = []
         y_batch = []
         
-        for i in range(len(len(y) // batch_size)):
+        for i in range(len(y) // batch_size):
             X_batch.append(np.array(X[i*batch_size : i* batch_size+batch_size, :]))
             y_batch.append(np.array(y[i*batch_size : i* batch_size+batch_size]))
 
