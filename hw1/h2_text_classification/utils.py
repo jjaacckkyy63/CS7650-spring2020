@@ -60,6 +60,7 @@ class UnigramFeature(FeatureExtractor):
                     index += 1
                 else:
                     continue
+        print(text_set)
                     
     def transform(self, text: list):
         """Transform a given sentence into vectors based on the extractor you got from self.fit()
