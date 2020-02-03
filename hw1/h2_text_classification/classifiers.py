@@ -152,9 +152,10 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
             print("Iteration:",n_iter)
             iter_correct = 0
             for i in range(n_batch):
-                print("Batch:", i,"/",n_batch)
+                # print("Batch:", i,"/",n_batch)
                 X_mini = X_batch[i]
                 Y_mini = Y_batch[i]
+                print(type(Y_mini))
 
                 self.weight = self.gradient_descent(X_mini, Y_mini, self.weight, self.lr)
                 y_preds = self.sigmoid(np.dot(X_mini, self.weight.T))
