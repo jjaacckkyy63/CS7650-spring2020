@@ -149,7 +149,6 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         n_iter = 0
 
         while n_iter < self.n_iterations:
-            print("Iteration:",n_iter)
             iter_correct = 0
             for i in range(n_batch):
                 X_mini = X_batch[i]
