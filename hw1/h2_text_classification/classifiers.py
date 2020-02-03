@@ -1,7 +1,7 @@
 import numpy as np
 import math
 ###################
-from tqdm import tqdm
+# from tqdm import tqdm
 import json
 import os
 ###################
@@ -120,7 +120,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
     
     def gradient_descent(self, X, y, weight, lr):
         y = y.reshape(-1, 1)
-        gradients = (np.dot(X.T, self.sigmoid(np.dot(X, weight.T)) - y) - 2 * self.reg_coefficient * weight) / len(y)
+        gradients = ((np.dot(X.T, self.sigmoid(np.dot(X, weight.T)) - y)) - 2 * self.reg_coefficient * weight.T) / len(y)
         new_weight = weight - lr * gradients.T
 
         return new_weight
@@ -140,10 +140,9 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         return np.array(X_batch), np.array(y_batch)
 
     def fit(self, X, Y):
-        
         self.weight = np.random.random(X.shape[1]).reshape(1, -1)
         self.l2_reg = self.reg_coefficient*np.dot(self.weight.T, self.weight)
-        self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat) + self.l2_reg) / len(y_hat)
+        self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat)) + self.l2_reg / len(y_hat)
 
         X_batch, Y_batch = self.prepare_batches(X, Y, self.batch_size)
         n_batch = len(Y_batch)
@@ -158,16 +157,13 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
                 Y_mini = Y_batch[i]
 
                 self.weight = self.gradient_descent(X_mini, Y_mini, self.weight, self.lr)
-                y_preds = []
-                for i in range(len(X_mini)):
-                    y_preds.append(self.sigmoid(np.dot(X_mini[i], self.weight.T)))
-                    
-                y_pred = np.dot(X_mini, self.weight.T)
-                print(y_pred.shape)
-
+                y_preds = self.sigmoid(np.dot(X_mini, self.weight.T))
                 self.train_loss.append(self.logloss(y_preds, Y_mini) / len(Y_mini))
 
-                batch_correct = y_pred==Y_mini
+                y_preds_digits = lambda X: (X > .5) * 1
+                print(y_preds_digits(y_preds))
+                batch_correct = y_preds_digits(y_preds)==Y_mini
+                print(batch_correct)
                 iter_correct += batch_correct
             n_iter += 1
             train_iter_acc = iter_correct / len(Y)
@@ -175,9 +171,9 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
             
     
     def predict(self, X):
-
-        preds = []
-        for item in X:
-            preds.append((self.sigmoid(np.dot(item, self.weight.T)) > 0.5)*1)
-        print(preds)
+        
+        y_preds_digits = lambda X: (X > .5) * 1
+        y_preds = self.sigmoid(np.dot(X, self.weight.T))
+        print(y_preds_digits(y_preds))
+        return y_preds_digits(y_preds)
 
