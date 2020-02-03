@@ -143,7 +143,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         
         self.weight = np.random.random(X.shape[1]).reshape(1, -1)
         self.l2_reg = self.reg_coefficient*np.dot(self.weight.T, self.weight)
-        self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat)) / len(y_hat)
+        self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat) + self.l2_reg) / len(y_hat)
 
         X_batch, Y_batch = self.prepare_batches(X, Y, self.batch_size)
         n_batch = len(Y_batch)
@@ -158,11 +158,14 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
                 Y_mini = Y_batch[i]
 
                 self.weight = self.gradient_descent(X_mini, Y_mini, self.weight, self.lr)
-                y_pred = self.sigmoid(np.dot(X_mini, self.weight.T))
-                print(y_pred)
+                y_preds = []
+                for i in len(X_mini):
+                    y_preds.append(self.sigmoid(np.dot(X_mini[i], betas.T)))
+                    
+                y_pred = np.dot(X_mini, self.weight.T)
                 print(y_pred.shape)
 
-                self.train_loss.append(self.logloss(y_pred, Y_mini) / len(Y_mini))
+                self.train_loss.append(self.logloss(y_preds, Y_mini) / len(Y_mini))
 
                 batch_correct = y_pred==Y_mini
                 iter_correct += batch_correct
