@@ -164,9 +164,9 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
                 y_preds_digits = lambda X: (X > .5) * 1
                 batch_correct = sum(y_preds_digits(y_preds)==Y_mini)
                 iter_correct += batch_correct
-            n_iter += 1
             train_iter_acc = iter_correct / len(Y)
             print("Iteration:", n_iter, "Acc:", train_iter_acc)
+            n_iter += 1
             
     
     def predict(self, X):
