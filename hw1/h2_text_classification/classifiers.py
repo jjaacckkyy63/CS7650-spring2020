@@ -109,7 +109,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
     def __init__(self):
         self.lr = 0.01
         self.batch_size = 16
-        self.n_iterations = 1000
+        self.n_iterations = 2000
         self.sigmoid = lambda z : 1 / (1 + np.exp(-z))
         self.reg_coefficient = 0.01
 
