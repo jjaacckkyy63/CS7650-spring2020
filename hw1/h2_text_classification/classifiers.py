@@ -160,7 +160,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
                 self.weight = self.gradient_descent(X_mini, Y_mini, self.weight, self.lr)
                 y_preds = []
                 for i in range(len(X_mini)):
-                    y_preds.append(self.sigmoid(np.dot(X_mini[i], betas.T)))
+                    y_preds.append(self.sigmoid(np.dot(X_mini[i], self.weight.T)))
                     
                 y_pred = np.dot(X_mini, self.weight.T)
                 print(y_pred.shape)
