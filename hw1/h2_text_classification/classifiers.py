@@ -118,14 +118,14 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         
 
     
-    def gradient_descent(X, y, weight, lr):
+    def gradient_descent(self, X, y, weight, lr):
         y = y.reshape(-1, 1)
         gradients = (np.dot(X.T, sigmoid(np.dot(X, weight.T)) - y) - 2 * self.reg_coefficient * weight) / len(y)
         new_weight = weight - lr * gradients.T
 
         return new_weight
     
-    def prepare_batches(X, y, batch_size):
+    def prepare_batches(self, X, y, batch_size):
         X_batch = []
         y_batch = []
         
