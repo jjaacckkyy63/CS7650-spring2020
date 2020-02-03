@@ -146,7 +146,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
         self.logloss = lambda y_hat, y : np.sum(-y * np.log(y_hat) - (1 - y) * np.log(1 - y_hat) + self.l2_reg) / len(y_hat)
 
         X_batch, Y_batch = self.prepare_batches(X, Y, self.batch_size)
-        n_batch = len(y_batch)
+        n_batch = len(Y_batch)
         n_iter = 0
 
         while n_iter < self.n_iterations:
