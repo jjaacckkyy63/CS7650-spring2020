@@ -1,7 +1,7 @@
 import numpy as np
 import math
 ###################
-# from tqdm import tqdm
+from tqdm import tqdm
 import json
 import os
 ###################
@@ -109,7 +109,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
     def __init__(self):
         self.lr = 0.01
         self.batch_size = 16
-        self.n_iterations = 10000
+        self.n_iterations = 100
         self.sigmoid = lambda z : 1 / (1 + np.exp(-z))
         self.reg_coefficient = 0.01
 
@@ -152,6 +152,8 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
             print("Iteration:",n_iter)
             iter_correct = 0
             for i in range(n_batch):
+                if i % 10 == 0:
+                    print("batch:",i)
                 X_mini = X_batch[i]
                 Y_mini = Y_batch[i]
 
@@ -164,7 +166,7 @@ class LogisticRegressionClassifier(HateSpeechClassifier):
                 iter_correct += batch_correct
             n_iter += 1
             train_iter_acc = iter_correct / len(Y)
-            print("Iteration:", n_iter+1, "Acc:", train_iter_acc)
+            print("Iteration:", n_iter, "Acc:", train_iter_acc)
             
     
     def predict(self, X):
