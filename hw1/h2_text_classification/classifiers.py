@@ -76,8 +76,6 @@ class NaiveBayesClassifier(HateSpeechClassifier):
             pos_prob = self.count[0][i] + 1 / self.count[0]['total_word']
             neg_prob = self.count[1][i] + 1/ self.count[1]['total_word']
             self.prob_ratio[i] = [pos_prob/neg_prob]
-        
-        print(self.prob_ratio)
         print("Top-10", sorted(self.prob_ratio.items(),key=lambda kv: kv[1])[-10:])
         print("Top-10-reverse", sorted(self.prob_ratio.items(),key=lambda kv: kv[1])[:10])
 
