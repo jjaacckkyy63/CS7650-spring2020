@@ -1,0 +1,23 @@
+The distributional hypothesis suggests that the more similarity there is in the meaning of two words, the more distributionally similar they are, where a word's distibution refers to the context in which it appears. This motivated the work by Mikolov et al. on the skip-gram model which is an efficient way of learning high quality dense vector representations of words from unstructured text. The objective of the skip-gram model is to learn the probability distribution $P(O|I)$ where given an inside word $w_I$, we intend to estimate the probability that an outside word $w_O$ lies in the context window of $w_I$. The basic formulation of the skip-gram model defines this using the softmax function:
+
+\begin{align}
+    P(O = w_O | I = w_I) = \frac{\exp(\bm{u_{w_O}}^T . \bm{v_{w_I}})}{\sum_{w \in \text{Vocab}} \exp(\bm{u_{w}}^T . \bm{v_{w_I}})}
+\end{align}{}
+
+Here, $\bm{u_{w_O}}$ is the word vector representing the outside word $o$ and $\bm{v_{w_I}}$ is the word vector representing the inside word $i$. To update these parameters continually during training, we store these in two matrices $\textbf{U}$ and $\textbf{V}$. The columns of $\textbf{V}$ are all of the inside word vectors $\bm{v_{w_I}}$ while the columns of $\textbf{U}$ are all the outside word vectors $\bm{u_{w_O}}$ and both these matrices contain a vector for each word in the vocabulary.
+
+\begin{enumerate}
+    \item The cross entropy loss between two probability distributions $p$ and $q$, is expressed as:
+        \begin{align}
+            CE(p, q) = - \sum_i p_i \log(q_i)
+        \end{align}
+        For, a given inside word $w_I = w_k$, if we consider the ground truth distribution $\bm{y}$ to be a one-hot vector (of length same as the size of vocabulary) with a 1 only for the true outside word $w_O$ and 0 everywhere else. The predicted distribution $\hat{\bm{y}}$ (of length same as the size of vocabulary) is the probability distribution $P(w_O | w_I = w_k)$. The $i^{th}$ entry in these vectors is the probability of the $i^{th}$ word being an outside word. Write down and simplify the expression for the cross entropy loss, $CE(\bm{y}, \hat{\bm{y}})$, for the skip-gram model described above for a single pair of words $w_O$ and $w_I$. (Note: your answer should be in terms of $P(O = w_O | I = w_I)$.) [2 pts]
+    \item Find the partial derivative of the cross entropy loss calculated in part (a) with respect to the inside word vector $\bm{v_{w_I}}$. (Note: your answer should be in terms of $\bm{y}$, $\hat{\bm{y}}$ and $\textbf{U}$.) [5 pts]
+    \item Find the partial derivative of the cross entropy loss calculated in part (a) with respect to each of the outside word vectors $\bm{u_{w_O}}$. (Note: Do this for both cases $w_O = O$ (true outside word) and $w_O \neq O$ (all other words). Your answer should be in terms of $\bm{y}$, $\hat{\bm{y}}$ and $\bm{v_{w_I}}$.) [5 pts]
+    \item Explain the idea of negative sampling and the use of the parameter $K$. Write down the loss function for this case. (Note: your answer should be in terms of $\bm{u_{w_O}}$, $\bm{v_{w_I}}$ and the parameter $K$.) [3 pts]
+\end{enumerate}
+
+
+\begin{solution} \ \\
+Solution goes here.
+\end{solution}

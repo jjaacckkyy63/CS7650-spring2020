@@ -1,0 +1,57 @@
+% \begin{enumerate}
+    The Kneser-Ney smoothing method approximates the probability of an n-gram that has not been seen using the likelihood of the (n-1)-gram to occur in diverse contexts.
+    If we want to finish the sentence ``I want to go to the movie \rule{1cm}{0.15mm}'' with the word ``theatre'' but we have not observed ``theatre'' very often, then we want to make sure that we can guess ``theatre'' based on its likelihood of combining with other words. \\
+    
+    The full formula for the bigram version of Kneser-Ney smoothing follows:
+    \begin{align}
+        P(bigram) = \text{discounted bigram probability} + \text{joint unigram probability} \\
+        P(w_{i} | w_{i-1}) = \frac{max(C(w_{i-1}, w_{i}) - d, 0)}{C(w_{i-1})} + \lambda(w_{i-1})\frac{|v : C(v, w_{i}) > 0|}{\sum_{w'} |v : C(v, w') > 0|} \\
+        \lambda(w_{i-1}) = \frac{d}{\sum_{v}C(w_{i-1}, v)} * |w : C(w_{i-1}w) > 0 |
+    \end{align}
+    
+    Assume that you have collected the data in the following tables, and assume that all other observed counts are 0.
+    In the bigram table, rows represent $w_{i-1}$, columns represent $w_{i}$: e.g. $C(\text{computer}, \text{keyboard})=2$.
+    % bigram counts
+    \begin{table}[h!]
+    \centering
+    \begin{tabular}{l | r r r r}
+    $C(w_{i-1},w_{i})$  & computer & keyboard & monitor & store \\ \hline
+    computer & 0        & 2        & 4       & 4     \\
+    keyboard & 1        & 0        & 0       & 1     \\
+    monitor  & 0        & 1        & 1       & 1     \\
+    store    & 2        & 0        & 0       & 0    
+    \end{tabular}
+    \caption{Bigram frequency. Rows = $w_{i-1}$, columns = $w_{i}$.}
+    \label{tab:bigram_data}
+    \end{table}
+    % unigram counts
+    \begin{table}[h!]
+    \centering
+    \begin{tabular}{l|r}
+        computer & 10 \\
+        keyboard & 3 \\
+        monitor & 6 \\
+        store & 5 \\
+    \end{tabular}
+    \caption{Unigram frequency.}
+    \label{tab:unigram_data}
+    \end{table}
+    
+    Consider the following sentence fragment \emph{S}: ``I shopped at the computer \rule{1cm}{0.15mm}''. \\
+    You need to determine whether the sentence is more likely to end with ``computer store'' or ``computer monitor.'' \\
+    \begin{enumerate}
+        \item 
+        Compute the raw bigram probabilities for the candidate words \{\emph{store}, \emph{monitor}\} to complete the sentence \emph{S}, i.e. $P(\text{store} | \text{computer})$ and $P(\text{monitor} | \text{computer})$.
+        Is one word more likely than the other, and if so which one? [2 pts]
+        \item Compute the Kneser-Ney smoothed bigram probability of the candidate words \{\emph{store}, \emph{monitor}\} to complete the sentence.
+        Use $d=0.5$ as the discount term.
+        Is one word more likely than the other, and if so which one?
+        If the result has changed, why do you think it changed? [5 pts]
+        \item Change the discount term to $d=0.1$ and re-compute the Kneser-Ney smoothed bigram probability of the candidate words \{\emph{store}, \emph{monitor}\} to complete the sentence.
+        Is one word more likely than the other, and if so which one?
+        If the result has changed, why do you think it changed? [3 pts]
+    \end{enumerate}
+
+\begin{solution} \ \\
+Solution goes here.
+\end{solution}
