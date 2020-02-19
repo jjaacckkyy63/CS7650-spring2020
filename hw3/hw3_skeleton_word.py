@@ -107,12 +107,12 @@ class NgramModel(object):
             context = generated_text[i-self.n:i]
             context = ' '.join(context)
             prob = self.prob(context, generated_text[i])
-            if prob == 0:
+            if prob == 0.0:
                 return float('inf')
             accu_prob += math.log(prob, 2)
-        ll = accu_prob / len(text)
+        l = accu_prob / length
         
-        return math.pow(2, -ll)
+        return 2**(-l)
 
 
 
