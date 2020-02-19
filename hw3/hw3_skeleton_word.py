@@ -62,13 +62,10 @@ class NgramModel(object):
     def prob(self, context:str, word:str):
         ''' Returns the probability of word appearing after context '''
 
-#         if context not in self.context_record:
-#             return 1/len(self.vocab)
+        if context not in self.context_record:
+            return 1/len(self.vocab)
         numerator = self.ngram_record.get((context, word), 0) + self.k
         denominator = self.context_record.get(context, 0) + self.k * len(self.get_vocab())
-        if denominator == 0:
-            return 0.0
-        
         return numerator / denominator
 
     def random_word(self, context):
