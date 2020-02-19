@@ -1,5 +1,5 @@
 import math, random
-
+from collections import defaultdict
 ################################################################################
 # Part 0: Utility Functions
 ################################################################################
@@ -16,7 +16,6 @@ def ngrams(n, text):
     padded_text = start_pad(n) + text
     for i in range(n,len(padded_text)):
         storage.append((padded_text[i-n:i] , padded_text[i]))
-
     return storage
 
 def create_ngram_model(model_class, path, n=2, k=0):
@@ -37,7 +36,8 @@ class NgramModel(object):
     def __init__(self, n, k):
         self.n = n
         self.k = k
-        self.counts = {}
+        self.ngram_record = defaultdict(int)
+        self.context_record = defaultdict(int)
         self.vocab = set()
 
     def get_vocab(self):
@@ -46,75 +46,71 @@ class NgramModel(object):
 
     def update(self, text):
         ''' Updates the model n-grams based on text '''
-        # update vocab
-        for c in text:
-            self.vocab.add(c)
 
         n_grams = ngrams(self.n, text)
-
-        for n_gram in n_grams:
-            context = n_gram[0]
-            char = n_gram[1]
-            if context in self.counts:
-                if char in self.counts[context]:
-                    self.counts[context][char] += 1
-                else:
-                    self.counts[context][char] = 1
-            else:
-                self.counts[context] = {}
-                self.counts[context][char] = 1
-
+        
+        for i in range(len(n_grams)):
+            ctex = n_grams[i][0]
+            char = n_grams[i][1]
+            self.vocab.add(char)
+            self.ngram_record[(ctex, char)] += 1
+            self.context_record[ctex] += 1
 
     def prob(self, context, char):
         ''' Returns the probability of char appearing after context '''
-        candidates = self.counts.get(context, None)
+        
+        if context not in self.context_record:
+            return 1/len(self.vocab)
+        numerator = self.ngram_record.get((context, char), 0) + self.k
+        denominator = self.context_record.get(context, 0) + self.k * len(self.get_vocab())
 
-        if not candidates:
-            return 1 / len(self.vocab)
-
-        num_char = self.counts[context].get(char, 0)
-        num_sum = sum(self.counts[context].values())
-
-        return num_char / num_sum
+        return numerator / denominator
 
     def random_char(self, context):
         ''' Returns a random character based on the given context and the 
             n-grams learned by this model '''
         # random.seed(1)
+        order_vocab = sorted(list(self.vocab))
         r = random.random()
+        accu_prob = 0
+        idx = 0
 
-        if context:
-            if context in self.counts:
-                order_char = sorted(self.counts[context].keys())
-            else:
-                order_char = sorted(list(self.vocab))    
-        else:
-            order_char = sorted(list(self.vocab))
-
-        order_char_prob = [self.prob(context, key) for key in order_char]
-        accu_prob = [sum(order_char_prob[:i]) for i in range(len(order_char_prob)+1)]
-
-        for i in range(1, len(order_char)+1):
-            if accu_prob[i-1] <= r and r < accu_prob[i]:
-                return order_char[i-1]
-
-
-        
-
+        while idx < len(self.vocab) and accu_prob < r:
+            accu_prob += self.prob(context, order_vocab[idx])
+            idx += 1
+        if accu_prob < r:
+            print("Error")
+            
+        return order_vocab[idx-1]
+    
     def random_text(self, length):
         ''' Returns text of the specified character length based on the
             n-grams learned by this model '''
-        generated_context = ''
-        for i in range(length):
-            s = self.random_char(generated_context)
-            generated_context += s
 
-        return generated_context
+        generated_context = []
+        context = start_pad(self.n)
+        
+        for i in range(length):
+            next_char = self.random_char(context)
+            generated_context.append(next_char)
+            if self.n > 0:
+                context = context[1:] + next_char
+        return ''.join(generated_context)
 
     def perplexity(self, text):
         ''' Returns the perplexity of text based on the n-grams learned by
             this model '''
-        pass
+        generated_text = start_pad(self.n) + text
+        accu_prob = 0
+        for i in range(self.n,len(generated_text)):
+            context = generated_text[i-self.n:i]
+            prob = self.prob(context, generated_text[i])
+            if prob == 0:
+                return float('inf')
+            accu_prob += math.log(prob, 2)
+        l = accu_prob / len(text)
+        
+        return math.pow(2, -l)
 
 ################################################################################
 # Part 2: N-Gram Model with Interpolation
@@ -124,17 +120,37 @@ class NgramModelWithInterpolation(NgramModel):
     ''' An n-gram model with interpolation '''
 
     def __init__(self, n, k):
-        pass
+        super(NgramModelWithInterpolation, self).__init__(n, k)
+        self.list_lambda = [1/(n+1)] * (n+1)
 
     def get_vocab(self):
-        pass
+        return self.vocab
 
     def update(self, text):
-        pass
+        ''' Updates the model n-grams based on text '''
+        # update vocab
+        for i in range(self.n+1):
+            n_grams = ngrams(i, text)
+            for i in range(len(n_grams)):
+                ctex = n_grams[i][0]
+                char = n_grams[i][1]
+                self.vocab.add(char)
+                self.ngram_record[(ctex, char)] += 1
+                self.context_record[ctex] += 1
 
     def prob(self, context, char):
-        pass
-
+        
+        p_in = 0        
+        for i in range(0, self.n+1):
+            context_in = context[i:]
+            numerator = self.ngram_record.get((context_in, char), 0) + self.k
+            denominator = self.context_record.get(context_in, 0) + self.k * len(self.get_vocab())
+            if self.k == 0 and denominator == 0: # avoid divide by zero
+                continue
+            
+            p_in += self.list_lambda[i] * numerator / denominator
+        return p_in
+            
 ################################################################################
 # Part 3: Your N-Gram Model Experimentation
 ################################################################################

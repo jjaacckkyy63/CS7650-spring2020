@@ -1,5 +1,6 @@
 import math, random
 from typing import List, Tuple
+from collections import defaultdict
 
 ################################################################################
 # Part 0: Utility Functions
@@ -16,7 +17,11 @@ def ngrams(n, text:str) -> Ngrams:
     text=text.strip().split()
     ''' Returns the ngrams of the text as tuples where the first element is
         the n-word sequence (i.e. "I love machine") context and the second is the word '''
-    pass
+    storage = []
+    padded_text = start_pad(n) + text
+    for i in range(n,len(padded_text)):
+        storage.append((tuple(padded_text[i-n:i],) , padded_text[i]))
+    return storage
 
 def create_ngram_model(model_class, path, n=2, k=0):
     ''' Creates and returns a new n-gram model trained on the path file '''
@@ -35,36 +40,75 @@ class NgramModel(object):
     def __init__(self, n, k):
         self.n = n
         self.k = k
+        self.ngram_record = defaultdict(int)
+        self.context_record = defaultdict(int)
         self.vocab = set()
-        self.count = {}
 
     def get_vocab(self):
         ''' Returns the set of words in the vocab '''
-        pass
+        return self.vocab
 
     def update(self, text:str):
         ''' Updates the model n-grams based on text '''
-        pass
+        n_grams = ngrams(self.n, text)
+        for i in range(len(n_grams)):
+            ctex = n_grams[i][0]
+            word = n_grams[i][1]
+            self.vocab.add(word)
+            self.ngram_record[(ctex, word)] += 1
+            self.context_record[ctex] += 1
 
     def prob(self, context:str, word:str):
         ''' Returns the probability of word appearing after context '''
-        pass
+        ctx = tuple(context.strip().split())
+        if ctx not in self.context_record:
+            return 1/len(self.vocab)
+        numerator = self.ngram_record.get((ctx, word), 0) + self.k
+        denominator = self.context_record.get(ctx, 0) + self.k * len(self.get_vocab())
+        return numerator / denominator
 
     def random_word(self, context):
         ''' Returns a random word based on the given context and the
             n-grams learned by this model '''
-#         random.seed(1)
-        pass
+        order_vocab = sorted(list(self.vocab))
+        r = random.random()
+        accu_prob = 0
+        idx = 0
 
+        while idx < len(self.vocab) and accu_prob < r:
+            accu_prob += self.prob(context, order_vocab[idx])
+            idx += 1
+        if accu_prob < r:
+            print("Error")
+        return order_vocab[idx-1]
+    
     def random_text(self, length):
         ''' Returns text of the specified word length based on the
             n-grams learned by this model '''
-        pass
+        generated_context = []
+        context = '\t'.join(start_pad(self.n))
+        
+        for i in range(length):
+            next_word = self.random_word(context)
+            generated_context.append(next_word)
+            if self.n > 0:
+                context = context + ' ' + next_word
+        return '\t'.join(generated_context)
 
     def perplexity(self, text):
         ''' Returns the perplexity of text based on the n-grams learned by
             this model '''
-        pass
+        generated_text = start_pad(self.n) + text
+        accu_prob = 0
+        for i in range(self.n,len(generated_text)):
+            context = generated_text[i-self.n:i]
+            prob = self.prob(context, generated_text[i])
+            if prob == 0:
+                return float('inf')
+            accu_prob += math.log(prob, 2)
+        l = accu_prob / len(text)
+        
+        return math.pow(2, -l)
 
 ################################################################################
 # Part 2: N-Gram Model with Interpolation
