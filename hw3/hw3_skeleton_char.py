@@ -86,16 +86,14 @@ class NgramModel(object):
     def random_text(self, length):
         ''' Returns text of the specified character length based on the
             n-grams learned by this model '''
-
         generated_context = []
         context = start_pad(self.n)
-        
         for i in range(length):
             next_char = self.random_char(context)
             generated_context.append(next_char)
             if self.n > 0:
                 context = context[1:] + next_char
-        return ''.join(generated_context[self.n:])
+        return ''.join(generated_context)
 
     def perplexity(self, text):
         ''' Returns the perplexity of text based on the n-grams learned by
