@@ -144,16 +144,12 @@ class NgramModelWithInterpolation(NgramModel):
                 self.word_count[word] += 1
                 
     def prob(self, context:str, word:str):
-        context = tuple(context.strip().split())
+        context = context.strip().split()
         p_in = 0
         for i in range(0, self.n+1):
-            context_in = context[i:]
-            if i == self.n:
-                context_in = tuple()
+            context_in = ' '.join(context[i:])
             numerator = self.ngram_record.get((context_in, word), 0) + self.k
             denominator = self.context_record.get(context_in, 0) + self.k * len(self.get_vocab())
-            if self.k == 0 and denominator == 0: # avoid divide by zero
-                continue
             p_in += self.list_lambda[i] * numerator / denominator
         return p_in
 
