@@ -95,7 +95,7 @@ class NgramModel(object):
             generated_context.append(next_char)
             if self.n > 0:
                 context = context[1:] + next_char
-        return ''.join(generated_context)
+        return ''.join(generated_context[self.n:])
 
     def perplexity(self, text):
         ''' Returns the perplexity of text based on the n-grams learned by

@@ -86,22 +86,24 @@ class NgramModel(object):
         ''' Returns text of the specified word length based on the
             n-grams learned by this model '''
         generated_context = []
-        context = '\t'.join(start_pad(self.n))
+        context = ' '.join(start_pad(self.n))
         
         for i in range(length):
             next_word = self.random_word(context)
             generated_context.append(next_word)
-            if self.n > 0:
-                context = context + ' ' + next_word
-        return '\t'.join(generated_context)
+            context = context[context.find(' ')+1:] + ' ' + next_word
+            
+        return ''.join(generated_context[self.n:])
 
     def perplexity(self, text):
         ''' Returns the perplexity of text based on the n-grams learned by
             this model '''
-        generated_text = start_pad(self.n) + text
+        length = len(text.strip().split())
+        generated_text = start_pad(self.n) + text.strip().split()
         accu_prob = 0
         for i in range(self.n,len(generated_text)):
             context = generated_text[i-self.n:i]
+            context = ' '.join(context)
             prob = self.prob(context, generated_text[i])
             if prob == 0:
                 return float('inf')
@@ -118,16 +120,38 @@ class NgramModelWithInterpolation(NgramModel):
     ''' An n-gram model with interpolation '''
 
     def __init__(self, n, k):
-        pass
+        super(NgramModelWithInterpolation, self).__init__(n, k)
+        self.list_lambda = [1/(n+1)] * (n+1)
+        self.word_count = defaultdict(int)
 
     def get_vocab(self):
-        pass
+        return self.vocab
 
     def update(self, text:str):
-        pass
-
+        # update vocab
+        for i in range(self.n+1):
+            n_grams = ngrams(i, text)
+            for i in range(len(n_grams)):
+                ctex = n_grams[i][0]
+                word = n_grams[i][1]
+                self.vocab.add(word)
+                self.ngram_record[(ctex, word)] += 1
+                self.context_record[ctex] += 1
+                self.word_count[word] += 1
+                
     def prob(self, context:str, word:str):
-        pass
+        context = tuple(context.strip().split())
+        p_in = 0
+        for i in range(0, self.n+1):
+            context_in = context[i:]
+            if i == self.n:
+                context_in = tuple()
+            numerator = self.ngram_record.get((context_in, word), 0) + self.k
+            denominator = self.context_record.get(context_in, 0) + self.k * len(self.get_vocab())
+            if self.k == 0 and denominator == 0: # avoid divide by zero
+                continue
+            p_in += self.list_lambda[i] * numerator / denominator
+        return p_in
 
 ################################################################################
 # Part 3: Your N-Gram Model Experimentation
