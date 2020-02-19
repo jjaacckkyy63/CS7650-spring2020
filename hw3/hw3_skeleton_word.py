@@ -91,10 +91,10 @@ class NgramModel(object):
         generated_text = context
         
         for i in range(length):
-            next_word = self.random_word(''.join(context))
+            next_word = self.random_word(' '.join(context))
             context = context[1:] + [next_word]
             generated_text.append(next_word)
-            
+        
         return ' '.join(generated_text[self.n:])
 
     def perplexity(self, text):
