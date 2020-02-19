@@ -20,7 +20,7 @@ def ngrams(n, text:str) -> Ngrams:
     storage = []
     padded_text = start_pad(n) + text
     for i in range(n,len(padded_text)):
-        storage.append((''.join(padded_text[i-n:i]), padded_text[i]))
+        storage.append((' '.join(padded_text[i-n:i]), padded_text[i]))
     return storage
 
 def create_ngram_model(model_class, path, n=2, k=0):
