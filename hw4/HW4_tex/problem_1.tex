@@ -1,0 +1,40 @@
+Suppose we are tagging a sentence ``They run programs" with two types of tags: N (noun) and V (verb). The initial probabilities, transition probabilities and emission probabilities computed by an HMM model are shown below.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+       & N & V  \\ \hline
+$\pi$  & 0.8   & 0.2      \\ \hline
+\end{tabular}\caption{Initial probabilities} \label{Tab:Initial}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+       & N & V  \\ \hline
+N  & 0.4   & 0.6      \\ \hline
+V  & 0.8   & 0.2      \\ \hline
+\end{tabular}\caption{Transition probabilities} \label{Tab:Trans}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+       & they & run & programs  \\ \hline
+N  & 0.6   & 0.2  &0.2      \\ \hline
+V  & 0   & 0.6  &0.4      \\ \hline
+\end{tabular}\caption{Emission probabilities} \label{Tab:Emission}
+\end{table}
+
+\begin{enumerate}
+    \item Given the HMM model above, compute the probability of the given sentence ``They run programs'' by using the Forward AND Backward Algorithm. Please show all the steps of calculations.  
+    [6 pts]
+    \item Tag the sentence  ``They run programs'' by using the Viterbi Algorithm. Please show all the steps of calculations. [4 pts]
+\end{enumerate}
+
+\begin{solution}
+Solution goes here.
+\end{solution}
