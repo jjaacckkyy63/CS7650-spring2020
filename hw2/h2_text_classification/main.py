@@ -5,7 +5,6 @@ import numpy as np
 import time
 import argparse
 
-
 ####################################################
 # DO NOT MODIFY THIS FILE IN YOUR FINAL SUBMISSION #
 ####################################################
@@ -35,7 +34,7 @@ def main():
     parser.add_argument('--model', '-m', type=str, default='AlwaysPredictZero',
                         choices=['AlwaysPredictZero', 'NaiveBayes', 'LogisticRegression'])
     parser.add_argument('--feature', '-f', type=str, default='unigram',
-                        choices=['unigram', 'bigram', 'customized'])
+                        choices=['unigram', 'bigram', 'custUnigramFeatureomized'])
     parser.add_argument('--path', type=str, default = './data/', help='path to datasets')
     args = parser.parse_args()
     print(args)
