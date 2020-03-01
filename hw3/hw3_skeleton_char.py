@@ -117,9 +117,12 @@ class NgramModel(object):
 class NgramModelWithInterpolation(NgramModel):
     ''' An n-gram model with interpolation '''
 
-    def __init__(self, n, k):
+    def __init__(self, n, k, list_lambda=None):
         super(NgramModelWithInterpolation, self).__init__(n, k)
-        self.list_lambda = [1/(n+1)] * (n+1)
+        if not list_lambda:
+            self.list_lambda = [1/(n+1)] * (n+1)
+        else:
+            self.list_lambda = list_lambda
 
     def get_vocab(self):
         return self.vocab
