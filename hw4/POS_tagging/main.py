@@ -91,6 +91,7 @@ DROPOUT = 0
 EPOCHS = 30
 CHAR_EMBEDDING_DIM = 4
 CHAR_HIDDEN_DIM = 2
+pretrained = False
 
 logging = "char_lstm_exp.txt"
 with open(logging, 'w+') as f:
@@ -112,7 +113,7 @@ model = CharPOSTagger(embedding_dim=EMBEDDING_DIM,
                         char_size=len(char_to_idx), 
                         vocab_size = len(word_to_idx), 
                         tagset_size = len(tag_to_idx),
-                        logging=logging)
+                        MAX_WORD_LEN=MAX_WORD_LEN)
 
 
 loss_function = nn.NLLLoss()

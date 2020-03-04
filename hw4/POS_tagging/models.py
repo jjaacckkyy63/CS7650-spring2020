@@ -28,7 +28,7 @@ class BasicPOSTagger(nn.Module):
 class CharPOSTagger(nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, char_embedding_dim, 
-                 char_hidden_dim, char_size, vocab_size, tagset_size):
+                 char_hidden_dim, char_size, vocab_size, tagset_size, MAX_WORD_LEN):
         super(CharPOSTagger, self).__init__()
 
         # word embedding
