@@ -8,7 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import time
 
-from models import BasicPOSTagger, BiLSTMPOSTagger
+from models import BasicPOSTagger, BiLSTMPOSTagger, CharPOSTagger
 from train import prepare_sequence, train, evaluate
 from utils import load_tag_data, load_txt_data
 
