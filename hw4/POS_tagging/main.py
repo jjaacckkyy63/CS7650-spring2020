@@ -51,32 +51,69 @@ idx_to_tag = {}
 for tag in tag_to_idx:
     idx_to_tag[tag_to_idx[tag]] = tag
 
+# Create char to index mapping
+char_to_idx = {}
+unique_chars = set()
+MAX_WORD_LEN = 0
+
+for sent in train_sentences:
+    for word in sent:
+        for c in word:
+            unique_chars.add(c)
+        if len(word) > MAX_WORD_LEN:
+            MAX_WORD_LEN = len(word)
+
+for c in unique_chars:
+    char_to_idx[c] = len(char_to_idx)
+char_to_idx[' '] = len(char_to_idx)
+
 print("Total tags", len(tag_to_idx))
 print("Vocab size", len(word_to_idx))
+print("Char size", len(char_to_idx))
 
 
-# init parameters
-EMBEDDING_DIM = 200
-HIDDEN_DIM = 16
-LEARNING_RATE = 0.01
-LSTM_LAYERS = 3
-DROPOUT = 0.2
-EPOCHS = 50
-BIDIRECTIONAL = True
-pretrained = True
+# init bilstm parameters
+# EMBEDDING_DIM = 200
+# HIDDEN_DIM = 16
+# LEARNING_RATE = 0.01
+# LSTM_LAYERS = 3
+# DROPOUT = 0.2
+# EPOCHS = 50
+# BIDIRECTIONAL = True
+# pretrained = True
 
-logging = "bilstm_exp_1.txt"
+# init char lstm
+EMBEDDING_DIM = 8
+HIDDEN_DIM = 4
+LEARNING_RATE = 0.1
+LSTM_LAYERS = 1
+DROPOUT = 0
+EPOCHS = 30
+CHAR_EMBEDDING_DIM = 4
+CHAR_HIDDEN_DIM = 2
+
+logging = "char_lstm_exp.txt"
 with open(logging, 'w+') as f:
     print("open", logging)
 
 # Initialize the model, optimizer and the loss function
-model = BiLSTMPOSTagger(embedding_dim=EMBEDDING_DIM, 
-                        hidden_dim=HIDDEN_DIM,
+# model = BiLSTMPOSTagger(embedding_dim=EMBEDDING_DIM, 
+#                         hidden_dim=HIDDEN_DIM,
+#                         vocab_size = len(word_to_idx), 
+#                         tagset_size = len(tag_to_idx),
+#                         lstm_layers = LSTM_LAYERS, 
+#                         dropout_rate = DROPOUT, 
+#                         bidirectional = BIDIRECTIONAL)
+
+model = CharPOSTagger(embedding_dim=EMBEDDING_DIM, 
+                        hidden_dim=HIDDEN_DIM, 
+                        char_embedding_dim=CHAR_EMBEDDING_DIM, 
+                        char_hidden_dim=CHAR_HIDDEN_DIM, 
+                        char_size=len(char_to_idx), 
                         vocab_size = len(word_to_idx), 
                         tagset_size = len(tag_to_idx),
-                        lstm_layers = LSTM_LAYERS, 
-                        dropout_rate = DROPOUT, 
-                        bidirectional = BIDIRECTIONAL)
+                        logging=logging)
+
 
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
